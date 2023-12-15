@@ -155,4 +155,32 @@ class UserTest extends TestCase
             $this->assertContains($followingUser->name, $followingUserNames);
         }
     }
+
+    /**
+     * フォロー中のユーザーを取得
+     * 
+     * @test
+     */
+    public function testFollowings()
+    {
+        // ユーザーとフォロー中のユーザーを作成
+        $user = User::factory()->create();
+        $followingUsers = User::factory()->count(3)->create();
+
+        // ユーザーが他のユーザーをフォローする
+        foreach ($followingUsers as $followingUser) {
+            $user->followings()->attach($followingUser);
+        }
+
+        // フォロー中のユーザーを取得
+        $userFollowings = User::getFollowings($user)->items();
+
+        // フォロー中のユーザーの名前を取得
+        $followingUserNames = collect($userFollowings)->pluck('name');
+
+        // 検証
+        foreach ($followingUsers as $followingUser) {
+            $this->assertContains($followingUser->name, $followingUserNames);
+        }
+    }
 }
