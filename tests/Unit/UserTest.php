@@ -201,10 +201,62 @@ class UserTest extends TestCase
         $followerUsers = User::getUserFollowers($user->name);
 
         $followerUserNames = $followerUsers->pluck('name')->toArray();
-        // dd($followerUserNames);
         // 検証
         foreach ($userFollowers as $userFollower) {
             $this->assertContains($userFollower->name, $followerUserNames);
+        }
+    }
+
+    // TODO 後で実装
+    /**
+     * フォロワーのユーザーを取得
+     * 
+     * @test
+     */
+    // public function testFollowers()
+    // {
+    //     $user = User::factory()->create();
+    //     $userFollowers = User::factory()->count(3)->create();
+
+    //     // 他のユーザーがユーザーをフォロー
+    //     foreach ($userFollowers as $userFollower) {
+    //         $userFollower->followers()->attach($user);
+    //     }
+
+    //     $followerUsers = User::getFollowers($user)->items();
+    //     // dd($followerUsers); // デバッグ出力を削除またはコメントアウト
+
+    //     $followerUserIds = collect($followerUsers)->pluck('name');
+
+    //     foreach ($userFollowers as $userFollower) {
+    //         $this->assertContains($userFollower->name, $followerUserIds);
+    //     }
+    // }
+
+    /**
+     * ブロック中のユーザーを取得
+     * 
+     * @test
+     */
+    public function testBlockUserList()
+    {
+        $user = User::factory()->create();
+        $blockedUsers = User::factory()->count(3)->create();
+
+        // ユーザーが他のユーザーをブロック
+        foreach ($blockedUsers as $blockedUser) {
+            $user->blockList()->attach($blockedUser);
+        }
+
+        // ブロックリストを取得
+        $blockUserList = User::getBlockUserList($user);
+
+        // ブロックリストに含まれるユーザーIDを取得
+        $blockedUserIds = $blockUserList->pluck('id')->toArray();
+
+        // 検証
+        foreach ($blockedUsers as $blockedUser) {
+            $this->assertContains($blockedUser->id, $blockedUserIds);
         }
     }
 }
