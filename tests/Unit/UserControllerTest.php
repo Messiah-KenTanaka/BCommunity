@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\User;
+use App\Article;
 use App\Tag;
 use App\UserPrefectureMap;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -42,12 +43,9 @@ class UserControllerTest extends TestCase
         $user = User::factory()->create();
 
         // 人気タグと関連記事のセットアップ
-        // TODO
-        // ここで Tag モデルと Article モデル、およびそれらの関連を適切に設定
-        // 
-        // $tag1 = Tag::factory()->create();
-        // $article1 = Article::factory()->create();
-        // $article1->tags()->attach($tag1);
+        $tag1 = Tag::factory()->create();
+        $article1 = Article::factory()->create(['user_id' => $user->id]);
+        $article1->tags()->attach($tag1);
 
         $response = $this->actingAs($user)->get(route('users.edit', ['name' => $user->name]));
 
