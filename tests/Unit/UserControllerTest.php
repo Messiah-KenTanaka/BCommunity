@@ -9,6 +9,9 @@ use App\UserPrefectureMap;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -61,5 +64,29 @@ class UserControllerTest extends TestCase
             $popularTags = Tag::getPopularTag();
             return $popularTags->pluck('name')->sort()->values()->all() === $viewTags->pluck('name')->sort()->values()->all();
         });
+    }
+
+    /**
+     * updateメソッドのテスト
+     * 
+     * @test
+     */
+    public function testUpdate()
+    {
+        Storage::fake('s3');
+
+        $user = User::factory()->create();
+        $newIntroduction = 'New Introduction';
+
+        $this->actingAs($user)->patch(route('users.update', ['name' => $user->name]), [
+            'introduction' => $newIntroduction,
+            'image' => UploadedFile::fake()->image('profile.jpg'),
+            'background_image' => UploadedFile::fake()->image('background.jpg'),
+        ]);
+
+        $user->refresh();
+
+        // TODO introduction以外の項目も追加予定
+        $this->assertEquals($newIntroduction, $user->introduction);
     }
 }
