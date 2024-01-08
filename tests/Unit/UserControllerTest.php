@@ -76,17 +76,31 @@ class UserControllerTest extends TestCase
         Storage::fake('s3');
 
         $user = User::factory()->create();
+        $newNickname = 'new nickname';
         $newIntroduction = 'New Introduction';
+        $newYoutube = 'new youtube';
+        $newTwitter = 'new twitter';
+        $newInstagram = 'new instagram';
+        $newTiktok = 'new tiktok';
 
         $this->actingAs($user)->patch(route('users.update', ['name' => $user->name]), [
             'introduction' => $newIntroduction,
+            'nickname' => $newNickname,
+            'youtube' => $newYoutube,
+            'twitter' => $newTwitter,
+            'instagram' => $newInstagram,
+            'tiktok' => $newTiktok,
             'image' => UploadedFile::fake()->image('profile.jpg'),
             'background_image' => UploadedFile::fake()->image('background.jpg'),
         ]);
 
         $user->refresh();
 
-        // TODO introduction以外の項目も追加予定
+        $this->assertEquals($newNickname, $user->nickname);
         $this->assertEquals($newIntroduction, $user->introduction);
+        $this->assertEquals($newYoutube, $user->youtube);
+        $this->assertEquals($newTwitter, $user->twitter);
+        $this->assertEquals($newInstagram, $user->instagram);
+        $this->assertEquals($newTiktok, $user->tiktok);
     }
 }
