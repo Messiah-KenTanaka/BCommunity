@@ -103,4 +103,30 @@ class UserControllerTest extends TestCase
         $this->assertEquals($newInstagram, $user->instagram);
         $this->assertEquals($newTiktok, $user->tiktok);
     }
+
+    /**
+     * likesメソッドのテスト
+     * 
+     * @test
+     */
+    public function testLikes()
+    {
+        // テスト用のユーザーと記事を作成
+        $user = User::factory()->create();
+        $article = Article::factory()->create(['user_id' => $user->id]);
+        // いいねを設定
+        $user->likes()->attach($article);
+
+        // アクションを実行
+        $response = $this->actingAs($user)->get(route('users.likes', ['name' => $user->name]));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.likes');
+        $response->assertViewHas('user', $user);
+        $response->assertViewHas('articles');
+        $response->assertViewHas('tags');
+        $response->assertViewHas('record');
+        $response->assertViewHas('isFollowing');
+    }
 }
