@@ -129,4 +129,28 @@ class UserControllerTest extends TestCase
         $response->assertViewHas('record');
         $response->assertViewHas('isFollowing');
     }
+
+    /**
+     * conquestメソッドのテスト
+     * 
+     * @test
+     */
+    public function testConquest()
+    {
+        $user = User::factory()->create();
+
+        // テスト用のフォロワーを作成
+        $follower = User::factory()->create();
+        $user->followers()->attach($follower);
+
+        $response = $this->actingAs($follower)->get(route('users.conquest', ['name' => $user->name]));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.conquest');
+        $response->assertViewHas('user', $user);
+        $response->assertViewHas('tags');
+        $response->assertViewHas('record');
+        $response->assertViewHas('isFollowing');
+    }
 }
