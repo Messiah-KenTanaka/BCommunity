@@ -153,4 +153,26 @@ class UserControllerTest extends TestCase
         $response->assertViewHas('record');
         $response->assertViewHas('isFollowing');
     }
+    /**
+     * followingsメソッドのテスト
+     * 
+     * @test
+     */
+    public function testFollowings()
+    {
+        $user = User::factory()->create();
+        $followingUser = User::factory()->create();
+        $user->followings()->attach($followingUser);
+
+        $response = $this->actingAs($user)->get(route('users.followings', ['name' => $user->name]));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.followings');
+        $response->assertViewHas('user', $user);
+        $response->assertViewHas('followings');
+        $response->assertViewHas('tags');
+        $response->assertViewHas('record');
+        $response->assertViewHas('isFollowing');
+    }
 }
