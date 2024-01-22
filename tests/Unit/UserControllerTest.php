@@ -198,4 +198,26 @@ class UserControllerTest extends TestCase
         $response->assertViewHas('record');
         $response->assertViewHas('isFollowing');
     }
+    /**
+     * blockのテストケース
+     * 
+     * @test
+     */
+    public function testBlock()
+    {
+        $user = User::factory()->create();
+        $blockedUser = User::factory()->create();
+        $user->blockList()->attach($blockedUser);
+
+        $response = $this->actingAs($user)->get(route('users.block', ['name' => $user->name]));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.block');
+        $response->assertViewHas('user', $user);
+        $response->assertViewHas('blockList');
+        $response->assertViewHas('tags');
+        $response->assertViewHas('record');
+        $response->assertViewHas('isFollowing');
+    }
 }
