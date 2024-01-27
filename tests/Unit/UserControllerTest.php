@@ -220,4 +220,32 @@ class UserControllerTest extends TestCase
         $response->assertViewHas('record');
         $response->assertViewHas('isFollowing');
     }
+
+    /**
+     * followのテストケース
+     * 
+     * @test
+     */
+    public function testFollow()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->put(route('users.follow', ['name' => $otherUser->name]));
+
+        // フォロー処理のアサーション
+        $this->assertTrue($user->followings->contains($otherUser));
+
+        // 通知のアサーション
+        $this->assertDatabaseHas('notifications', [
+            'sender_id' => $user->id,
+            'receiver_id' => $otherUser->id,
+            'type' => 'follow',
+            'read' => false
+        ]);
+
+        // レスポンスのアサーション
+        $response->assertOk();
+        $response->assertJson(['name' => $otherUser->name]);
+    }
 }
