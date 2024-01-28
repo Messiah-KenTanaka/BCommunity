@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BlockList extends Model
 {
+    use HasFactory;
+
     protected $table = 'block_list';
 
     protected $fillable = [

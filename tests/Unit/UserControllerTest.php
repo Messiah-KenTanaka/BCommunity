@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\User;
 use App\Article;
 use App\Tag;
+use App\BlockList;
 use App\UserPrefectureMap;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -247,5 +248,27 @@ class UserControllerTest extends TestCase
         // レスポンスのアサーション
         $response->assertOk();
         $response->assertJson(['name' => $otherUser->name]);
+    }
+
+    /**
+     * userBlockのテストケース
+     * 
+     * @test
+     */
+    public function testUserBlock()
+    {
+        $user = User::factory()->create();
+        $blockedUser = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('users.userBlock', ['userId' => $user->id]), [
+            'article_user_id' => $blockedUser->id
+        ]);
+
+        $response->assertRedirect(route('articles.index'));
+        $response->assertSessionHas('success', 'ユーザーをブロックしました。');
+        $this->assertDatabaseHas('block_list', [
+            'user_id' => $user->id,
+            'blocked_user_id' => $blockedUser->id
+        ]);
     }
 }
