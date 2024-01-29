@@ -271,4 +271,27 @@ class UserControllerTest extends TestCase
             'blocked_user_id' => $blockedUser->id
         ]);
     }
+
+    /**
+     * searchUsersメソッドのテストケース
+     * 
+     * @test
+     */
+    public function testSearchUsers()
+    {
+        // テスト用のユーザーを作成
+        $user = User::factory()->create(['nickname' => 'testnickname']);
+        $searchedNickname = 'testnickname';
+
+        $response = $this->get(route('searchUsers', ['nickname' => $searchedNickname]));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.search_users');
+        $response->assertViewHas('users', function ($viewUsers) use ($user) {
+            return $viewUsers->contains($user);
+        });
+        $response->assertViewHas('tags');
+        $response->assertViewHas('searched_name', $searchedNickname);
+    }
 }
