@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\User;
 use App\Article;
 use App\Tag;
+use App\Notification;
 use App\BlockList;
 use App\UserPrefectureMap;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -293,5 +294,34 @@ class UserControllerTest extends TestCase
         });
         $response->assertViewHas('tags');
         $response->assertViewHas('searched_name', $searchedNickname);
+    }
+
+    /**
+     * notificationsメソッドのテストケース
+     * 
+     * @test
+     */
+    public function testNotifications()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        // テスト用の通知を作成
+        Notification::create([
+            'sender_id' => $otherUser->id,
+            'receiver_id' => $user->id,
+            'type' => 'test',
+            'read' => false,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('notifications'));
+
+        // アサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.notifications');
+        $response->assertViewHas('notifications', function ($viewNotifications) use ($user) {
+            return $viewNotifications->first()->receiver_id === $user->id;
+        });
+        $response->assertViewHas('tags');
     }
 }
