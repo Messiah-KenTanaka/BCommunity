@@ -324,4 +324,22 @@ class UserControllerTest extends TestCase
         });
         $response->assertViewHas('tags');
     }
+
+    /**
+     * confirmDeleteUserメソッドのテストケース
+     * 
+     * @test
+     */
+    public function testConfirmDeleteUser()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('users.confirmDeleteUser', ['userId' => $user->id]));
+
+        // 正しいアクセスのアサーション
+        $response->assertStatus(200);
+        $response->assertViewIs('users.confirm_delete_user');
+        $response->assertViewHas('user', $user);
+        $response->assertViewHas('tags');
+    }
 }
