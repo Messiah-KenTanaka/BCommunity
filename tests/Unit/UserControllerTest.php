@@ -15,6 +15,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserControllerTest extends TestCase
 {
@@ -341,5 +343,28 @@ class UserControllerTest extends TestCase
         $response->assertViewIs('users.confirm_delete_user');
         $response->assertViewHas('user', $user);
         $response->assertViewHas('tags');
+    }
+
+    /**
+     * deleteUserメソッドのテストケース
+     * 
+     * @test
+     */
+    public function testDeleteUser()
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('correctpassword')
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('users.deleteUser', ['userId' => $user->id]), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => 'correctpassword'
+        ]);
+
+        $response->assertRedirect(route('articles.index'));
+        $response->assertSessionHas('success', 'ユーザーを削除しました。');
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertFalse(Auth::check());
     }
 }
